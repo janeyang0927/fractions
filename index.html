@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>똑딱똑딱 도깨비 분수 떡집</title>
+  <!-- 귀여운 한글 폰트 Jua & 영문/숫자용 깔끔한 Outfit -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Jua&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 배경 요소 (둥근 달과 구름) -->
+  <div class="sky-background">
+    <div class="moon"></div>
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+    <div class="stars"></div>
+  </div>
+
+  <div class="app-container">
+    <!-- 헤더 영역 -->
+    <header class="game-header">
+      <div class="logo-area">
+        <span class="logo-emoji">🍡</span>
+        <h1>똑딱똑딱 도깨비 분수 떡집</h1>
+      </div>
+      
+      <div class="status-bar">
+        <!-- 사운드 토글 -->
+        <button id="sound-toggle-btn" class="header-btn" title="소리 켜고 끄기">
+          <span class="icon">🔊</span> 소리 켬
+        </button>
+        <!-- 코인 표시 -->
+        <div class="coin-display">
+          <span class="coin-icon">🪙</span>
+          <span id="total-coins">0</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- 네비게이션 탭 -->
+    <nav class="game-nav">
+      <button class="nav-tab active" data-game="game1">
+        <span class="tab-num">게임 1</span>
+        <span class="tab-title">도깨비 떡 썰기</span>
+      </button>
+      <button class="nav-tab" data-game="game2">
+        <span class="tab-num">게임 2</span>
+        <span class="tab-title">조각 떡 배달</span>
+      </button>
+      <button class="nav-tab" data-game="game3">
+        <span class="tab-num">게임 3</span>
+        <span class="tab-title">도깨비 저울 배틀</span>
+      </button>
+    </nav>
+
+    <!-- 메인 게임 보드 -->
+    <main class="game-board">
+      
+      <!-- ==================== 게임 1: 도깨비 떡 썰기 ==================== -->
+      <section id="game1-container" class="game-section active">
+        <div class="game-layout">
+          <!-- 왼쪽 패널 (도깨비 말풍선, 문제 정보, 분수 입력창) -->
+          <div class="panel panel-left">
+            <div class="goblin-wrapper">
+              <!-- SVG 아기 도깨비 (핑크 깨비) -->
+              <div class="goblin-character pink-goblin" id="g1-goblin">
+                <svg viewBox="0 0 100 100" class="goblin-svg">
+                  <!-- 뿔 -->
+                  <polygon points="50,5 40,25 60,25" fill="#FF8E9E" stroke="#E05C70" stroke-width="3" stroke-linejoin="round"/>
+                  <!-- 몸통 (둥글둥글) -->
+                  <circle cx="50" cy="55" r="35" fill="#FFA3B1" stroke="#E05C70" stroke-width="4"/>
+                  <!-- 눈 -->
+                  <circle class="eye eye-left" cx="38" cy="50" r="6" fill="#333"/>
+                  <circle class="eye eye-right" cx="62" cy="50" r="6" fill="#333"/>
+                  <!-- 눈 반짝임 -->
+                  <circle class="eye-shine eye-left-shine" cx="36" cy="48" r="2" fill="#fff"/>
+                  <circle class="eye-shine eye-right-shine" cx="60" cy="48" r="2" fill="#fff"/>
+                  <!-- 볼터치 -->
+                  <ellipse cx="32" cy="58" rx="5" ry="3" fill="#FF6B8B" opacity="0.6"/>
+                  <ellipse cx="68" cy="58" rx="5" ry="3" fill="#FF6B8B" opacity="0.6"/>
+                  <!-- 입 -->
+                  <path class="goblin-mouth" d="M 45 62 Q 50 67 55 62" fill="none" stroke="#333" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="speech-bubble">
+                <p id="g1-question-text">문제를 불러오는 중...</p>
+              </div>
+            </div>
+
+            <!-- 분수 입력창 -->
+            <div class="fraction-input-area">
+              <div class="fraction-labels-hint hidden" id="g1-labels-hint">
+                <div class="label-hint-numerator">분자: 색칠한 조각 수</div>
+                <div class="label-hint-denominator">분모: 전체 조각 수</div>
+              </div>
+              
+              <div class="vertical-fraction">
+                <input type="number" id="g1-numerator" class="fraction-num" min="1" max="10" placeholder="?" autocomplete="off">
+                <div class="fraction-line"></div>
+                <input type="number" id="g1-denominator" class="fraction-denom" min="2" max="10" placeholder="?" autocomplete="off">
+              </div>
+
+              <button id="g1-submit-btn" class="jelly-btn submit-btn">🍡 떡 배달하기!</button>
+            </div>
+
+            <!-- 힌트 마법 -->
+            <div class="hint-magic-zone">
+              <p class="hint-title">✨ 도깨비 힌트 마법</p>
+              <div class="hint-buttons">
+                <button id="g1-hint1-btn" class="hint-btn">🏷️ 이름표 (-2 🪙)</button>
+                <button id="g1-hint2-btn" class="hint-btn">🔢 카운터 (-4 🪙)</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 오른쪽 패널 (떡 썰기 캔버스 & 조작 버튼) -->
+          <div class="panel panel-right">
+            <div class="canvas-card">
+              <div class="canvas-header">
+                <h3>꿀맛 동그라미 떡</h3>
+                <!-- 실시간 카운터 힌트가 표시될 곳 -->
+                <div id="g1-counter-hint" class="counter-hint-box hidden">
+                  <span class="count-item">전체 조각: <strong id="g1-total-cnt">0</strong>개</span>
+                  <span class="count-item">색칠한 조각: <strong id="g1-filled-cnt">0</strong>개</span>
+                </div>
+              </div>
+              
+              <div class="canvas-wrapper">
+                <canvas id="game1-canvas" width="340" height="340"></canvas>
+              </div>
+
+              <!-- 자르기 도구 조작 -->
+              <div class="cut-control">
+                <span class="control-label">몇 조각으로 자를까?</span>
+                <div class="cut-btn-group">
+                  <button class="cut-btn" data-slices="2">2등분</button>
+                  <button class="cut-btn" data-slices="3">3등분</button>
+                  <button class="cut-btn" data-slices="4">4등분</button>
+                  <button class="cut-btn" data-slices="5">5등분</button>
+                  <button class="cut-btn" data-slices="6">6등분</button>
+                  <button class="cut-btn" data-slices="8">8등분</button>
+                </div>
+                <div class="canvas-instruction">
+                  💡 자르기 버튼을 누르고, 떡 조각을 콕콕 클릭해서 꿀을 발라(색칠) 주세요!
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 게임 2: 조각 떡 배달 ==================== -->
+      <section id="game2-container" class="game-section">
+        <div class="game-layout-g2">
+          <!-- 도깨비 손님들 (왼쪽 영역) -->
+          <div class="g2-customers">
+            <!-- 도깨비 A -->
+            <div class="g2-customer" id="g2-cust-A" data-goblin="A">
+              <div class="goblin-speech">
+                <span class="goblin-name">분홍이</span>
+                <p class="order-text">주문 대기 중...</p>
+              </div>
+              <div class="g2-goblin-char pink-goblin">
+                <!-- SVG 도깨비 A -->
+                <svg viewBox="0 0 100 100" class="goblin-svg">
+                  <polygon points="50,5 40,25 60,25" fill="#FF8E9E" stroke="#E05C70" stroke-width="3" stroke-linejoin="round"/>
+                  <circle cx="50" cy="55" r="35" fill="#FFA3B1" stroke="#E05C70" stroke-width="4"/>
+                  <circle class="eye eye-left" cx="38" cy="50" r="6" fill="#333"/>
+                  <circle class="eye eye-right" cx="62" cy="50" r="6" fill="#333"/>
+                  <circle class="eye-shine" cx="36" cy="48" r="2" fill="#fff"/>
+                  <circle class="eye-shine" cx="60" cy="48" r="2" fill="#fff"/>
+                  <path class="goblin-mouth" d="M 45 62 Q 50 67 55 62" fill="none" stroke="#333" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <!-- 떡 접시 (Drop Zone) -->
+              <div class="plate-zone" data-target="A">
+                <div class="plate-label">접시</div>
+                <div class="plate-dish">
+                  <!-- 접시에 떡이 채워지는 SVG 효과 -->
+                  <svg viewBox="0 0 100 100" class="plate-svg" id="plate-svg-A">
+                    <circle cx="50" cy="50" r="45" fill="#FFF" stroke="#EAD2B8" stroke-width="4" stroke-dasharray="4 2"/>
+                  </svg>
+                  <div class="plate-count-overlay" id="plate-count-A">0</div>
+                </div>
+              </div>
+              <!-- 정답 입력 -->
+              <div class="g2-input-box hidden" id="g2-input-box-A">
+                <div class="g2-fraction-wrapper">
+                  <span>받은 떡은 전체의 </span>
+                  <div class="vertical-fraction mini">
+                    <input type="number" class="g2-num" placeholder="?">
+                    <div class="fraction-line"></div>
+                    <input type="number" class="g2-denom" placeholder="?">
+                  </div>
+                </div>
+                <button class="jelly-btn g2-delivery-btn" data-target="A">배달 완료! 🪙</button>
+              </div>
+            </div>
+
+            <!-- 도깨비 B -->
+            <div class="g2-customer" id="g2-cust-B" data-goblin="B">
+              <div class="goblin-speech">
+                <span class="goblin-name">노랑이</span>
+                <p class="order-text">주문 대기 중...</p>
+              </div>
+              <div class="g2-goblin-char yellow-goblin">
+                <!-- SVG 도깨비 B -->
+                <svg viewBox="0 0 100 100" class="goblin-svg">
+                  <polygon points="45,5 38,22 52,22" fill="#FCE17D" stroke="#D3A715" stroke-width="3" stroke-linejoin="round"/>
+                  <polygon points="55,5 48,22 62,22" fill="#FCE17D" stroke="#D3A715" stroke-width="3" stroke-linejoin="round"/>
+                  <circle cx="50" cy="55" r="35" fill="#FFE58F" stroke="#D3A715" stroke-width="4"/>
+                  <circle class="eye eye-left" cx="38" cy="50" r="6" fill="#333"/>
+                  <circle class="eye eye-right" cx="62" cy="50" r="6" fill="#333"/>
+                  <circle class="eye-shine" cx="36" cy="48" r="2" fill="#fff"/>
+                  <circle class="eye-shine" cx="60" cy="48" r="2" fill="#fff"/>
+                  <path class="goblin-mouth" d="M 45 62 Q 50 67 55 62" fill="none" stroke="#333" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="plate-zone" data-target="B">
+                <div class="plate-label">접시</div>
+                <div class="plate-dish">
+                  <svg viewBox="0 0 100 100" class="plate-svg" id="plate-svg-B">
+                    <circle cx="50" cy="50" r="45" fill="#FFF" stroke="#EAD2B8" stroke-width="4" stroke-dasharray="4 2"/>
+                  </svg>
+                  <div class="plate-count-overlay" id="plate-count-B">0</div>
+                </div>
+              </div>
+              <div class="g2-input-box hidden" id="g2-input-box-B">
+                <div class="g2-fraction-wrapper">
+                  <span>받은 떡은 전체의 </span>
+                  <div class="vertical-fraction mini">
+                    <input type="number" class="g2-num" placeholder="?">
+                    <div class="fraction-line"></div>
+                    <input type="number" class="g2-denom" placeholder="?">
+                  </div>
+                </div>
+                <button class="jelly-btn g2-delivery-btn" data-target="B">배달 완료! 🪙</button>
+              </div>
+            </div>
+
+            <!-- 도깨비 C -->
+            <div class="g2-customer" id="g2-cust-C" data-goblin="C">
+              <div class="goblin-speech">
+                <span class="goblin-name">파랑이</span>
+                <p class="order-text">주문 대기 중...</p>
+              </div>
+              <div class="g2-goblin-char blue-goblin">
+                <!-- SVG 도깨비 C -->
+                <svg viewBox="0 0 100 100" class="goblin-svg">
+                  <polygon points="50,5 45,25 55,25" fill="#75C6FF" stroke="#3787C0" stroke-width="3" stroke-linejoin="round"/>
+                  <circle cx="50" cy="55" r="35" fill="#9CD8FF" stroke="#3787C0" stroke-width="4"/>
+                  <circle class="eye eye-left" cx="38" cy="50" r="6" fill="#333"/>
+                  <circle class="eye eye-right" cx="62" cy="50" r="6" fill="#333"/>
+                  <circle class="eye-shine" cx="36" cy="48" r="2" fill="#fff"/>
+                  <circle class="eye-shine" cx="60" cy="48" r="2" fill="#fff"/>
+                  <path class="goblin-mouth" d="M 45 62 Q 50 67 55 62" fill="none" stroke="#333" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="plate-zone" data-target="C">
+                <div class="plate-label">접시</div>
+                <div class="plate-dish">
+                  <svg viewBox="0 0 100 100" class="plate-svg" id="plate-svg-C">
+                    <circle cx="50" cy="50" r="45" fill="#FFF" stroke="#EAD2B8" stroke-width="4" stroke-dasharray="4 2"/>
+                  </svg>
+                  <div class="plate-count-overlay" id="plate-count-C">0</div>
+                </div>
+              </div>
+              <div class="g2-input-box hidden" id="g2-input-box-C">
+                <div class="g2-fraction-wrapper">
+                  <span>받은 떡은 전체의 </span>
+                  <div class="vertical-fraction mini">
+                    <input type="number" class="g2-num" placeholder="?">
+                    <div class="fraction-line"></div>
+                    <input type="number" class="g2-denom" placeholder="?">
+                  </div>
+                </div>
+                <button class="jelly-btn g2-delivery-btn" data-target="C">배달 완료! 🪙</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 하단 매대 (떡 조각 드래그 영역) -->
+          <div class="g2-shop">
+            <div class="g2-shop-header">
+              <h3>🍡 조각 떡 매대 (원하는 떡을 접시로 드래그하세요!)</h3>
+              <div class="hint-magic-zone mini">
+                <button id="g2-hint1-btn" class="hint-btn">🏷️ 떡 이름표 (-2 🪙)</button>
+                <button id="g2-hint2-btn" class="hint-btn">⏰ 접시 카운터 (-4 🪙)</button>
+              </div>
+            </div>
+            
+            <div class="g2-baskets">
+              <!-- 1/2 조각 떡 바구니 -->
+              <div class="g2-basket" data-fraction="1/2">
+                <div class="basket-tag hidden">1/2 떡</div>
+                <div class="basket-dish">
+                  <!-- 조각 떡 드래그 아이템 (가이드 점선 추가) -->
+                  <div class="draggable-ricecake" draggable="true" data-denom="2" data-num="1">
+                    <svg viewBox="0 0 100 100" class="ricecake-svg">
+                      <!-- 전체 점선 원 -->
+                      <circle cx="50" cy="50" r="45" fill="none" stroke="#D0D0D0" stroke-width="2" stroke-dasharray="4 3"/>
+                      <!-- 분할 점선 (2등분선) -->
+                      <line x1="50" y1="5" x2="50" y2="95" stroke="#B0B0B0" stroke-width="2" stroke-dasharray="3 3"/>
+                      <!-- 1/2 떡 조각 -->
+                      <path d="M 50 50 L 50 5 A 45 45 0 0 1 50 95 Z" fill="#9BD1A6" stroke="#4F895C" stroke-width="2"/>
+                    </svg>
+                  </div>
+                </div>
+                <span class="basket-label">반달 쑥떡 (1/2)</span>
+              </div>
+
+              <!-- 1/3 조각 떡 바구니 -->
+              <div class="g2-basket" data-fraction="1/3">
+                <div class="basket-tag hidden">1/3 떡</div>
+                <div class="basket-dish">
+                  <div class="draggable-ricecake" draggable="true" data-denom="3" data-num="1">
+                    <svg viewBox="0 0 100 100" class="ricecake-svg">
+                      <!-- 전체 점선 원 -->
+                      <circle cx="50" cy="50" r="45" fill="none" stroke="#D0D0D0" stroke-width="2" stroke-dasharray="4 3"/>
+                      <!-- 분할 점선 (3등분선) -->
+                      <line x1="50" y1="5" x2="50" y2="50" stroke="#B0B0B0" stroke-width="2" stroke-dasharray="3 3"/>
+                      <line x1="50" y1="50" x2="88.97" y2="72.5" stroke="#B0B0B0" stroke-width="2" stroke-dasharray="3 3"/>
+                      <line x1="50" y1="50" x2="11.03" y2="72.5" stroke="#B0B0B0" stroke-width="2" stroke-dasharray="3 3"/>
+                      <!-- 1/3 떡 조각 -->
+                      <path d="M 50 50 L 50 5 A 45 45 0 0 1 88.97 72.5 Z" fill="#FAD178" stroke="#CD9928" stroke-width="2"/>
+                    </svg>
+                  </div>
+                </div>
+                <span class="basket-label">노랑 호박떡 (1/3)</span>
+              </div>
+
+              <!-- 1/4 조각 떡 바구니 -->
+              <div class="g2-basket" data-fraction="1/4">
+                <div class="basket-tag hidden">1/4 떡</div>
+                <div class="basket-dish">
+                  <div class="draggable-ricecake" draggable="true" data-denom="4" data-num="1">
+                    <svg viewBox="0 0 100 100" class="ricecake-svg">
+                      <!-- 전체 점선 원 -->
+                      <circle cx="50" cy="50" r="45" fill="none" stroke="#D0D0D0" stroke-width="2" stroke-dasharray="4 3"/>
+                      <!-- 분할 점선 (4등분선) -->
+                      <line x1="50" y1="5" x2="50" y2="95" stroke="#B0B0B0" stroke-width="2" stroke-dasharray="3 3"/>
+                      <line x1="5" y1="50" x2="95" y2="50" stroke="#B0B0B0" stroke-width="2" stroke-dasharray="3 3"/>
+                      <!-- 1/4 떡 조각 -->
+                      <path d="M 50 50 L 50 5 A 45 45 0 0 1 95 50 Z" fill="#FFA4B4" stroke="#E16277" stroke-width="2"/>
+                    </svg>
+                  </div>
+                </div>
+                <span class="basket-label">분홍 딸기떡 (1/4)</span>
+              </div>
+
+              <!-- 1/5 조각 떡 바구니 -->
+              <div class="g2-basket" data-fraction="1/5">
+                <div class="basket-tag hidden">1/5 떡</div>
+                <div class="basket-dish">
+                  <div class="draggable-ricecake" draggable="true" data-denom="5" data-num="1">
+                    <svg viewBox="0 0 100 100" class="ricecake-svg">
+                      <!-- 전체 점선 원 -->
+                      <circle cx="50" cy="50" r="45" fill="none" stroke="#D0D0D0" stroke-width="2" stroke-dasharray="4 3"/>
+                      <!-- 분할 점선 (5등분선) -->
+                      <line x1="50" y1="5" x2="50" y2="50" stroke="#B0B0B0" stroke-width="2" stroke-dasharray="3 3"/>
+                      <line x1="50" y1="50" x2="92.8" y2="36.1" stroke="#B0B0B0" stroke-width="2" stroke-dasharray="3 3"/>
+                      <line x1="50" y1="50" x2="76.4" y2="92.8" stroke="#B0B0B0" stroke-width="2" stroke-dasharray="3 3"/>
+                      <line x1="50" y1="50" x2="23.6" y2="92.8" stroke="#B0B0B0" stroke-width="2" stroke-dasharray="3 3"/>
+                      <line x1="50" y1="50" x2="7.2" y2="36.1" stroke="#B0B0B0" stroke-width="2" stroke-dasharray="3 3"/>
+                      <!-- 1/5 떡 조각 -->
+                      <path d="M 50 50 L 50 5 A 45 45 0 0 1 92.8 36.1 Z" fill="#C4B3E6" stroke="#8770BA" stroke-width="2"/>
+                    </svg>
+                  </div>
+                </div>
+                <span class="basket-label">보라 자색고구마떡 (1/5)</span>
+              </div>
+            </div>
+
+            <!-- 접시 비우기 버튼 -->
+            <button id="g2-reset-btn" class="jelly-btn reset-btn">🗑️ 접시 비우기 (다시 담기)</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== 게임 3: 도깨비 저울 배틀 ==================== -->
+      <section id="game3-container" class="game-section">
+        <div class="g3-game-wrapper">
+          <!-- 레벨 전환 및 몬스터 정보 -->
+          <div class="g3-battle-header">
+            <div class="g3-level-selector">
+              <button class="level-btn active" data-level="1">🟢 레벨 1 (분모가 같을 때)</button>
+              <button class="level-btn" data-level="2">🔥 레벨 2 (분모가 다를 때)</button>
+            </div>
+            <div class="g3-monster-area">
+              <span class="monster-emoji">👾</span>
+              <span class="g3-message-log">저울에 알맞은 떡 카드를 올려 몬스터를 물리치세요!</span>
+            </div>
+          </div>
+
+          <!-- 저울 판넬 -->
+          <div class="g3-scale-area">
+            <!-- 왼쪽 저울 기둥과 접시 -->
+            <div class="scale-machine">
+              <!-- 저울의 메인 가로 바 (CSS 회전) -->
+              <div class="scale-beam" id="g3-scale-beam">
+                <!-- 왼쪽 실선 지지대 -->
+                <div class="scale-hanger hanger-left">
+                  <!-- 왼쪽 접시 (Drop Zone) -->
+                  <div class="scale-plate plate-left" id="g3-plate-left">
+                    <div class="plate-title">왼쪽 접시</div>
+                    <div class="plate-content-zone" id="g3-plate-left-content">
+                      <span class="drop-placeholder">여기에 떡 카드 놓기</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 힌지 센터 축 (단순 비주얼) -->
+                <div class="scale-hinge"></div>
+
+                <!-- 오른쪽 실선 지지대 -->
+                <div class="scale-hanger hanger-right">
+                  <!-- 오른쪽 접시 (Drop Zone) -->
+                  <div class="scale-plate plate-right" id="g3-plate-right">
+                    <div class="plate-title">오른쪽 접시</div>
+                    <div class="plate-content-zone" id="g3-plate-right-content">
+                      <span class="drop-placeholder">여기에 떡 카드 놓기</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <!-- 저울 받침대 스탠드 -->
+              <div class="scale-stand"></div>
+            </div>
+
+            <!-- 저울 하단의 분수 수치 표시창 및 부등호 드롭존 (VS 대체) -->
+            <div class="scale-values">
+              <div class="fraction-display-box" id="g3-fraction-left">1/3</div>
+              <div class="scale-operator-dropzone" id="g3-operator-dropzone">?</div>
+              <div class="fraction-display-box" id="g3-fraction-right">1/5</div>
+            </div>
+          </div>
+
+          <!-- 부등호 드래그 패널 (초기 비활성화) -->
+          <div class="g3-comparison-panel">
+            <span class="g3-panel-label">👉 알맞은 부등호를 가운데의 [?] 상자에 드래그해 넣으세요!</span>
+            <div class="g3-operators-deck">
+              <div class="g3-op-card locked" draggable="true" id="g3-op-gt" data-op="gt">&gt;</div>
+              <div class="g3-op-card locked" draggable="true" id="g3-op-lt" data-op="lt">&lt;</div>
+            </div>
+            <div class="lock-indicator" id="g3-lock-text">🔒 먼저 저울 양쪽에 알맞은 떡 카드를 드래그해 올리세요!</div>
+          </div>
+
+          <!-- 하단 카드 매대 (드래그 카드 더미) -->
+          <div class="g3-cards-deck">
+            <div class="deck-header">
+              <h3>🎴 조각 떡 카드 더미 (알맞은 카드를 저울 접시로 가져가세요)</h3>
+              <div class="hint-magic-zone mini">
+                <button id="g3-hint1-btn" class="hint-btn">🔍 조각 수 돋보기 (-2 🪙)</button>
+                <button id="g3-hint2-btn" class="hint-btn">⏰ 정답 거울 (-4 🪙)</button>
+              </div>
+            </div>
+            <!-- 카드 리스트가 생성되어 들어갈 구역 -->
+            <div class="g3-cards-container" id="g3-cards-list">
+              <!-- 카드는 JS에서 매 세션마다 랜덤 순서로 생성함 -->
+            </div>
+          </div>
+
+          <!-- 카드 제자리로 비우기 버튼 -->
+          <button id="g3-reset-btn" class="jelly-btn reset-btn">🔄 저울 비우기</button>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- 정답 축하 모달창 (코인 획득 연출용) -->
+  <div id="reward-modal" class="modal-overlay hidden">
+    <div class="modal-card">
+      <div class="goblin-avatar-celebration">
+        <svg viewBox="0 0 100 100" class="goblin-svg mini">
+          <polygon points="50,5 40,25 60,25" fill="#FF8E9E" stroke="#E05C70" stroke-width="3"/>
+          <circle cx="50" cy="55" r="35" fill="#FFA3B1" stroke="#E05C70" stroke-width="4"/>
+          <!-- 정답 축하를 위해 윙크와 웃는 눈 -->
+          <path d="M 32 50 Q 38 45 44 50" fill="none" stroke="#333" stroke-width="4" stroke-linecap="round"/>
+          <path d="M 56 50 Q 62 45 68 50" fill="none" stroke="#333" stroke-width="4" stroke-linecap="round"/>
+          <!-- 입을 벌리고 기뻐함 -->
+          <circle cx="50" cy="65" r="7" fill="#E05C70"/>
+        </svg>
+      </div>
+      <h2>🎉 정말 멋져! 최고야! 🎉</h2>
+      <p class="modal-message">맛있는 떡을 배달하고 도깨비를 행복하게 했어!</p>
+      <div class="modal-reward-box">
+        <span class="earned-coin-anim">🪙 +10</span>
+      </div>
+      <button id="modal-next-btn" class="jelly-btn">다음 문제 풀기! ➡️</button>
+    </div>
+  </div>
+
+  <!-- 파티클 이펙트용 캔버스 (전체 화면) -->
+  <canvas id="particle-canvas" class="particle-canvas-layer"></canvas>
+
+  <script src="main.js"></script>
+  <script src="game1.js"></script>
+  <script src="game2.js"></script>
+  <script src="game3.js"></script>
+</body>
+</html>
